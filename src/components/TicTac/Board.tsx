@@ -4,55 +4,43 @@ const Board: React.FC<{size: number}> = (props) => {
     const [cells, updateSells] = useState(Array(props.size **2).fill(null))
     const [move, changeMove] = useState(true)
     const [isEnd, checkIsEnd] = useState(false)
+    const checkArrayTemplate = (array: string[], newCells: string[], index: number) => {
+        if (array.every(element => element === newCells[index]) && newCells[index] !== null) {
+            checkIsEnd(true)
+            alert(`${newCells[index]} is win`)
+            return true
+        }
+        return false
+    }
     const checkEnd = (newCells: string[], index: number) => {
         const rowIndex = Math.floor(index / props.size)
         const columnIndex = index % props.size
         //Check row
         const arrRow = newCells.slice(rowIndex * props.size, rowIndex * props.size + props.size)
-        if (arrRow.every(element => element === newCells[index]) && newCells[index] !== null) {
-            checkIsEnd(true)
-            alert(`${newCells[index]} is win`)
-            return
-        }
-        //Check Column
+        if(checkArrayTemplate(arrRow, newCells, index)) return false
         let arrColumn = []
         for (let j = 0; j < props.size; j++) {
             arrColumn.push(newCells[j * props.size + columnIndex])
         }
-        if(arrColumn.every(element => element === newCells[index]) && newCells[index] !== null) {
-            if(!isEnd)
-            checkIsEnd(true)
-            alert(`${cells[index]} is win`)
-            return
-        }
+        if(checkArrayTemplate(arrColumn, newCells, index)) return false
         let mainDiagonal = []
         for (let j = 0; j < props.size; j++) {
             mainDiagonal.push(newCells[j * (props.size + 1)])
         }
-        if(mainDiagonal.every(element => element === newCells[index]) && newCells[index] !== null) {
-            checkIsEnd(true)
-            alert(`${cells[index]} is win`)
-            return
-        }
+        if(checkArrayTemplate(mainDiagonal, newCells, index)) return false
         let antiDiagonal = []
         for (let j = 0; j < props.size; j++) {
             antiDiagonal.push(newCells[j * props.size - (props.size - 1 - j)])
         }
-        if(antiDiagonal.every(element => element === newCells[index]) && newCells[index] !== null) {
-            checkIsEnd(true)
-            alert(`${cells[index]} is win`)
-            return
-        }
-        //Check diagonales
-        
+        if(checkArrayTemplate(antiDiagonal, newCells, index)) return false
     }
     const handleMove = (index: number) => {
-        if(isEnd && cells[index]) return
+        if(isEnd || cells[index]) return
         const newCells = [...cells]
         newCells[index] = move ? 'x' : 'o'
-        updateSells(newCells)
         changeMove(!move)
-        checkEnd(newCells, index)
+        if(!checkEnd(newCells, index))
+            updateSells(newCells)
     }
     const renderCells = () => {
         return cells.map((cell, index) => {
